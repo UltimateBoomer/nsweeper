@@ -17,9 +17,10 @@ struct GameSetting {
   size_t numMines;
 };
 
-constexpr std::array settings{GameSetting{{9, 9}, 10},
-                              GameSetting{{16, 16}, 40},
-                              GameSetting{{30, 16}, 99}};
+constexpr std::array settings{
+    std::pair{GameSetting{{9, 9}, 10}, "Beginner"},
+    std::pair{GameSetting{{16, 16}, 40}, "Intermediate"},
+    std::pair{GameSetting{{30, 16}, 99}, "Advanced"}};
 
 Game::Game(std::istream &is, std::ostream &os)
     : board{RegularBoard{8, 8}},
@@ -60,9 +61,9 @@ void Game::run() {
   os << "Welcome to NSweeper!" << std::endl;
   os << "Select type of game: " << std::endl;
   for (auto it = settings.begin(); it != settings.end(); ++it) {
-    os << std::format("{}: ({}x{}, {} mines)",
-                      std::distance(settings.begin(), it), it->dim.x, it->dim.y,
-                      it->numMines)
+    os << std::format("{}: {} ({}x{}, {} mines)",
+                      std::distance(settings.begin(), it), it->second,
+                      it->first.dim.x, it->first.dim.y, it->first.numMines)
        << std::endl;
   }
   std::string mode;
@@ -74,7 +75,7 @@ void Game::run() {
     size_t num;
     if (std::istringstream{mode} >> num) {
       if (num < settings.size()) {
-        s = settings[num];
+        s = settings[num].first;
         break;
       }
     }
@@ -94,12 +95,6 @@ void Game::setup() {
   bool cont = true;
   while (cont) {
     try {
-      /* int gameType = 0; */
-      /* os << "Welcome to NSweeper!" << std::endl; */
-      /* os << "Select type of game:" << std::endl; */
-      /* os << "0: Beginner (9x9/10)" << std::endl; */
-      /* os << "1: Intermediate (16x16/40)" << std::endl; */
-      /* os << "2: Advanced ()" << std::endl; */
       os << "SETUP > ";
       is >> cmd;
 
@@ -136,13 +131,35 @@ void Game::runLoop() {
     display->notify();
     controller->makeMove();
     auto state = std::visit([](auto &&b) { return b.getState(); }, board);
-    if (std::holds_alternative<GameWon>(state)) {
-      os << "You won!" << std::endl;
-      break;
-    } else if (std::holds_alternative<GameLost>(state)) {
-      os << "You lost!" << std::endl;
+
+    if (!std::holds_alternative<std::monostate>(state)) {
       break;
     }
   }
+  std::visit(Visitor{[&](GameWon &&) {
+                       display->notify();
+                       os << "You won!" << std::endl;
+                     },
+                     [&](GameLost &&) {
+                       display->notify();
+                       os << "You Lost!" << std::endl;
+                     },
+                     [&](auto &&) {}},
+             std::visit([](auto &&b) { return b.getState(); }, board));
+
+  /* std::visit( */
+  /*     [&](auto &&b) { */
+  /*       std::visit(Visitor{[&](GameWon &&) { */
+  /*                            display->notify(); */
+  /*                            os << "You won!" << std::endl; */
+  /*                          }, */
+  /*                          [&](GameLost &&) { */
+  /*                            display->notify(); */
+  /*                            os << "You Lost!" << std::endl; */
+  /*                          }, */
+  /*                          [&](auto &&) {}}, */
+  /*                  b.getState()); */
+  /*     }, */
+  /*     board); */
 }
 } // namespace nsweeper
