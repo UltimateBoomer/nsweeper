@@ -9,7 +9,7 @@ class TermDisplay : public Display {
   std::ostream &os;
 
 public:
-  TermDisplay(const BoardVariant &board, std::ostream &os);
+  [[nodiscard]] TermDisplay(const BoardVariant &board, std::ostream &os);
 
   virtual void notify() override;
 };

@@ -29,28 +29,29 @@ public:
   template <typename... PosArgs> void setMine(bool mine, PosArgs &&...pos);
 
   // Get cell at pos
-  Cell &getCell(size_t i);
-  const Cell &getCell(size_t i) const;
-  template <typename... PosArgs> Cell &getCell(PosArgs &&...pos);
-  template <typename... PosArgs> const Cell &getCell(PosArgs &&...pos) const;
+  [[nodiscard]] Cell &getCell(size_t i);
+  [[nodiscard]] const Cell &getCell(size_t i) const;
+  template <typename... PosArgs> [[nodiscard]] Cell &getCell(PosArgs &&...pos);
+  template <typename... PosArgs>
+  [[nodiscard]] const Cell &getCell(PosArgs &&...pos) const;
 
   GameState &getState();
   const GameState &getState() const;
 
   void clear();
 
-  size_t size() const;
-  size_t getNumMines() const;
-  size_t getNumRevealed() const;
-  size_t getNumFlagged() const;
+  [[nodiscard]] size_t size() const;
+  [[nodiscard]] size_t getNumMines() const;
+  [[nodiscard]] size_t getNumRevealed() const;
+  [[nodiscard]] size_t getNumFlagged() const;
 
-  size_t toIndex(PosType pos) const;
+  [[nodiscard]] size_t toIndex(PosType pos) const;
 
   using Pos = PosType;
 
   // Convert pos to index
 protected:
-  Board(size_t numCells);
+  [[nodiscard]] Board(size_t numCells);
 };
 
 template <typename T, typename PosType>

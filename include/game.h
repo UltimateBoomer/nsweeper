@@ -14,7 +14,7 @@ class Game {
   std::ostream &os;
 
 public:
-  Game(std::istream &is, std::ostream &os);
+  [[nodiscard]] Game(std::istream &is, std::ostream &os);
 
   void run();
 

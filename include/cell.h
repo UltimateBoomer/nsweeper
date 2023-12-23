@@ -14,10 +14,10 @@ class Cell {
   std::vector<Cell *> adjacentCells;
 
 public:
-  Cell();
-  Cell(bool mine);
+  [[nodiscard]] Cell();
+  [[nodiscard]] Cell(bool mine);
 
-  bool hasMine() const;
+  [[nodiscard]] bool hasMine() const;
 
   // Set whether the cell contains a mine
   // Return the change in num of mines on board
@@ -26,8 +26,8 @@ public:
   std::pair<PressResult, int> press();
   std::pair<PressResult, int> flag();
 
-  CellState &getState();
-  const CellState &getState() const;
+  [[nodiscard]] CellState &getState();
+  [[nodiscard]] const CellState &getState() const;
 
   void addAdjacentCell(Cell &other);
 

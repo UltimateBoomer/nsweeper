@@ -6,6 +6,8 @@
 #include "termdisplay.h"
 #include "visitor.h"
 #include <array>
+#include <bits/chrono.h>
+#include <chrono>
 #include <format>
 #include <memory>
 #include <sstream>
@@ -126,6 +128,7 @@ void Game::setup() {
 }
 
 void Game::runLoop() {
+  auto t1 = std::chrono::high_resolution_clock::now();
   std::string cmd;
   while (is) {
     display->notify();
@@ -136,30 +139,22 @@ void Game::runLoop() {
       break;
     }
   }
-  std::visit(Visitor{[&](GameWon &&) {
-                       display->notify();
-                       os << "You won!" << std::endl;
-                     },
-                     [&](GameLost &&) {
-                       display->notify();
-                       os << "You Lost!" << std::endl;
-                     },
-                     [&](auto &&) {}},
-             std::visit([](auto &&b) { return b.getState(); }, board));
-
-  /* std::visit( */
-  /*     [&](auto &&b) { */
-  /*       std::visit(Visitor{[&](GameWon &&) { */
-  /*                            display->notify(); */
-  /*                            os << "You won!" << std::endl; */
-  /*                          }, */
-  /*                          [&](GameLost &&) { */
-  /*                            display->notify(); */
-  /*                            os << "You Lost!" << std::endl; */
-  /*                          }, */
-  /*                          [&](auto &&) {}}, */
-  /*                  b.getState()); */
-  /*     }, */
-  /*     board); */
+  auto t2 = std::chrono::high_resolution_clock::now();
+  std::visit(
+      Visitor{[&](GameWon &&) {
+                display->notify();
+                os << "You won!" << std::endl;
+                os << std::format(
+                          "Time: {}",
+                          std::chrono::duration_cast<std::chrono::seconds>(t2 -
+                                                                           t1))
+                   << std::endl;
+              },
+              [&](GameLost &&) {
+                display->notify();
+                os << "You Lost!" << std::endl;
+              },
+              [&](auto &&) {}},
+      std::visit([](auto &&b) { return b.getState(); }, board));
 }
 } // namespace nsweeper

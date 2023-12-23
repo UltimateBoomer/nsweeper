@@ -9,12 +9,12 @@ class RegularBoard : public Board<RegularBoard, Vec2> {
   Vec2 dim;
 
 public:
-  RegularBoard(size_t width, size_t height);
+  [[nodiscard]] RegularBoard(size_t width, size_t height);
 
-  size_t getWidth() const;
-  size_t getHeight() const;
+  [[nodiscard]] size_t getWidth() const;
+  [[nodiscard]] size_t getHeight() const;
 
-  size_t toIndex(Vec2 pos) const;
+  [[nodiscard]] size_t toIndex(Vec2 pos) const;
 };
 
 /* template <typename... PosArgs> */

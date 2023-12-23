@@ -12,7 +12,8 @@ class TermController : public Controller {
   std::ostream &os;
 
 public:
-  TermController(BoardVariant &board, std::istream &is, std::ostream &os);
+  [[nodiscard]] TermController(BoardVariant &board, std::istream &is,
+                               std::ostream &os);
 
   PressResult makeMove() override;
 };

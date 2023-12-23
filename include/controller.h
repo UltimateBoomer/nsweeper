@@ -12,7 +12,7 @@ class Controller {
   BoardVariant &board;
 
 public:
-  Controller(BoardVariant &board);
+  [[nodiscard]] Controller(BoardVariant &board);
   virtual ~Controller() = default;
 
   // Make move on board
@@ -22,7 +22,7 @@ public:
   /* void distribute(size_t n, unsigned int seed); */
 
 protected:
-  BoardVariant &getBoard();
+  [[nodiscard]] BoardVariant &getBoard();
 };
 
 /* template <typename BoardType> */
