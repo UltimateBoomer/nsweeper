@@ -1,11 +1,13 @@
-#include "game.h"
+#include "interactivegame.h"
 #include "regularboard.h"
-#include "termcontroller.h"
-#include "termdisplay.h"
+#include <clocale>
+#include <ncpp/NotCurses.hh>
 
 using namespace nsweeper;
 
 int main(int argc, char *argv[]) {
-  Game game{std::cin, std::cout};
-  game.run();
+  setlocale(LC_CTYPE, "");
+  ncpp::NotCurses nc;
+  InteractiveGame game{nc};
+  /* game.run(); */
 }

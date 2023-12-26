@@ -15,6 +15,6 @@ public:
   [[nodiscard]] TermController(BoardVariant &board, std::istream &is,
                                std::ostream &os);
 
-  PressResult makeMove() override;
+  void makeMove() override;
 };
 } // namespace nsweeper

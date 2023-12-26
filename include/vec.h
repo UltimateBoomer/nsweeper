@@ -4,7 +4,7 @@
 
 namespace nsweeper {
 struct Vec2 {
-  size_t x;
-  size_t y;
+  int x;
+  int y;
 };
 } // namespace nsweeper

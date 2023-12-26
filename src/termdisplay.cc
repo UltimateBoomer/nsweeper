@@ -3,17 +3,13 @@
 #include "display.h"
 #include "gamestate.h"
 #include "regularboard.h"
+#include "textchar.h"
 #include "visitor.h"
 #include <array>
 #include <format>
 #include <variant>
 
 namespace nsweeper {
-constexpr std::string emptyChar = "・";
-constexpr std::array<std::string, 10> numDisplayTable{
-    "＋", "１", "２", "３", "４", "５", "６", "７", "８", "９"};
-constexpr std::string flagChar = "🚩";
-constexpr std::string mineChar = "＊";
 
 TermDisplay::TermDisplay(const BoardVariant &board, std::ostream &os)
     : Display{board}, os{os} {}
@@ -21,11 +17,11 @@ TermDisplay::TermDisplay(const BoardVariant &board, std::ostream &os)
 struct BoardVisitor {
   std::ostream &os;
 
-  template <typename BoardType> void operator()(const BoardType &board);
+  template <typename BoardType> void operator()(const BoardType &board) const;
 };
 
 template <>
-void BoardVisitor::operator()<RegularBoard>(const RegularBoard &board) {
+void BoardVisitor::operator()<RegularBoard>(const RegularBoard &board) const {
   os << "+" << std::string(board.getWidth() * 2, '-') << "+" << std::endl;
   for (size_t y = 0; y < board.getHeight(); ++y) {
     os << "|";

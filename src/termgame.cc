@@ -1,4 +1,5 @@
-#include "game.h"
+#include "termgame.h"
+#include "gamesetting.h"
 #include "gamestate.h"
 #include "pressresult.h"
 #include "regularboard.h"
@@ -14,17 +15,7 @@
 #include <variant>
 
 namespace nsweeper {
-struct GameSetting {
-  Vec2 dim;
-  size_t numMines;
-};
-
-constexpr std::array settings{
-    std::pair{GameSetting{{9, 9}, 10}, "Beginner"},
-    std::pair{GameSetting{{16, 16}, 40}, "Intermediate"},
-    std::pair{GameSetting{{30, 16}, 99}, "Advanced"}};
-
-Game::Game(std::istream &is, std::ostream &os)
+TermGame::TermGame(std::istream &is, std::ostream &os)
     : board{RegularBoard{8, 8}},
       display{std::make_unique<TermDisplay>(board, os)},
       controller{std::make_unique<TermController>(board, is, os)}, is{is},
@@ -59,7 +50,7 @@ void distribute(BoardType &&board, size_t n, unsigned int seed) {
   }
 }
 
-void Game::run() {
+void TermGame::run() {
   os << "Welcome to NSweeper!" << std::endl;
   os << "Select type of game: " << std::endl;
   for (auto it = settings.begin(); it != settings.end(); ++it) {
@@ -92,7 +83,7 @@ void Game::run() {
   runLoop();
 }
 
-void Game::setup() {
+void TermGame::setup() {
   std::string cmd;
   bool cont = true;
   while (cont) {
@@ -127,7 +118,7 @@ void Game::setup() {
   }
 }
 
-void Game::runLoop() {
+void TermGame::runLoop() {
   auto t1 = std::chrono::high_resolution_clock::now();
   std::string cmd;
   while (is) {

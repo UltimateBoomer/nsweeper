@@ -11,7 +11,7 @@ TermController::TermController(BoardVariant &board, std::istream &is,
                                std::ostream &os)
     : Controller{board}, is{is}, os{os} {}
 
-PressResult TermController::makeMove() {
+void TermController::makeMove() {
   std::string cmd;
   os << "> ";
   is >> cmd;
@@ -19,15 +19,12 @@ PressResult TermController::makeMove() {
   if (cmd == "p" || cmd == "press") {
     size_t x, y;
     is >> x >> y;
-    return std::visit([&](auto &&board) { return board.press(x, y); },
-                      getBoard());
+    std::visit([&](auto &&board) { return board.press(x, y); }, getBoard());
   } else if (cmd == "f" || cmd == "flag") {
     size_t x, y;
     is >> x >> y;
-    return std::visit([&](auto &&board) { return board.flag(x, y); },
-                      getBoard());
+    std::visit([&](auto &&board) { return board.flag(x, y); }, getBoard());
   }
-  return PressInvalid();
 }
 
 } // namespace nsweeper
