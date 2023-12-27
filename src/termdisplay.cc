@@ -1,4 +1,5 @@
 #include "termdisplay.h"
+#include "boardvisitor.h"
 #include "cellstate.h"
 #include "display.h"
 #include "gamestate.h"
@@ -11,83 +12,79 @@
 
 namespace nsweeper {
 
-TermDisplay::TermDisplay(const BoardVariant &board, std::ostream &os)
-    : Display{board}, os{os} {}
-
-struct BoardVisitor {
-  std::ostream &os;
-
-  template <typename BoardType> void operator()(const BoardType &board) const;
-};
-
-template <>
-void BoardVisitor::operator()<RegularBoard>(const RegularBoard &board) const {
-  os << "+" << std::string(board.getWidth() * 2, '-') << "+" << std::endl;
-  for (size_t y = 0; y < board.getHeight(); ++y) {
-    os << "|";
-    for (size_t x = 0; x < board.getWidth(); ++x) {
-      auto &state = board.getCell(x, y).getState();
-      std::visit(Visitor{[&](auto) { os << emptyChar; },
-                         [&](CellFlagged) { os << flagChar; },
-                         [&](CellRevealed v) {
-                           os << numDisplayTable[v.numAdjacentMines];
-                         }},
-                 state);
-    }
-    os << "|" << std::endl;
-  }
-  os << "+" << std::string(board.getWidth() * 2, '-') << "+" << std::endl;
-}
-
-struct RevealedBoardVisitor {
-  std::ostream &os;
-
-  template <typename BoardType> void operator()(const BoardType &board);
-};
-
-template <>
-void RevealedBoardVisitor::operator()<RegularBoard>(const RegularBoard &board) {
-  os << "+" << std::string(board.getWidth() * 2, '-') << "+" << std::endl;
-  for (size_t y = 0; y < board.getHeight(); ++y) {
-    os << "|";
-    for (size_t x = 0; x < board.getWidth(); ++x) {
-      auto &cell = board.getCell(x, y);
-      auto &state = cell.getState();
-      std::visit(
-          Visitor{[&](auto) { os << (cell.hasMine() ? mineChar : emptyChar); },
-                  [&](CellFlagged) {
-                    os << (cell.hasMine() ? mineChar : flagChar);
-                  },
-                  [&](CellRevealed v) {
-                    os << numDisplayTable[v.numAdjacentMines];
-                  }},
-          state);
-    }
-    os << "|" << std::endl;
-  }
-  os << "+" << std::string(board.getWidth() * 2, '-') << "+" << std::endl;
-}
-
-void TermDisplay::notify() {
-  std::visit(
-      [&](auto &&b) {
-        os << std::format("Mines: {}/{}", b.getNumFlagged(), b.getNumMines())
-           << std::endl;
-        os << std::format("Board: {}/{}", b.getNumRevealed(), b.size())
-           << std::endl;
-      },
-      getBoard());
-
-  bool revealMines = std::visit(
-      [](auto &&b) {
-        return !std::holds_alternative<std::monostate>(b.getState());
-      },
-      getBoard());
-  if (revealMines) {
-    std::visit(RevealedBoardVisitor{os}, getBoard());
-  } else {
-    std::visit(BoardVisitor{os}, getBoard());
-  }
-}
+/* TermDisplay::TermDisplay(const Board *board, std::ostream &os) */
+/*     : Display{board}, os{os} {} */
+/**/
+/* struct PrintBoardVisitor : public ConstBoardVisitor { */
+/*   std::ostream &os; */
+/**/
+/*   explicit PrintBoardVisitor(std::ostream &os) : os{os} {} */
+/**/
+/*   virtual void operator()(const RegularBoard &board) override { */
+/*     auto [width, height] = board.getDim(); */
+/*     os << "+" << std::string(width * 2, '-') << "+" << std::endl; */
+/*     for (size_t y = 0; y < height; ++y) { */
+/*       os << "|"; */
+/*       for (size_t x = 0; x < width; ++x) { */
+/*         auto &state = board.getCell(x, y).getState(); */
+/*         std::visit(Visitor{[&](auto) { os << emptyChar; }, */
+/*                            [&](CellFlagged) { os << flagChar; }, */
+/*                            [&](CellRevealed v) { */
+/*                              os << numDisplayTable[v.numAdjacentMines]; */
+/*                            }}, */
+/*                    state); */
+/*       } */
+/*       os << "|" << std::endl; */
+/*     } */
+/*     os << "+" << std::string(width * 2, '-') << "+" << std::endl; */
+/*   } */
+/* }; */
+/**/
+/* struct PrintRevealedBoardVisitor : public ConstBoardVisitor { */
+/*   std::ostream &os; */
+/**/
+/*   explicit PrintRevealedBoardVisitor(std::ostream &os) : os{os} {} */
+/**/
+/*   virtual void operator()(const RegularBoard &board) override { */
+/*     auto [width, height] = board.getDim(); */
+/*     os << "+" << std::string(width * 2, '-') << "+" << std::endl; */
+/*     for (size_t y = 0; y < height; ++y) { */
+/*       os << "|"; */
+/*       for (size_t x = 0; x < width; ++x) { */
+/*         auto &cell = board.getCell(x, y); */
+/*         auto &state = cell.getState(); */
+/*         std::visit(Visitor{[&](auto) { */
+/*                              os << (cell.hasMine() ? mineChar : emptyChar);
+ */
+/*                            }, */
+/*                            [&](CellFlagged) { */
+/*                              os << (cell.hasMine() ? mineChar : flagChar); */
+/*                            }, */
+/*                            [&](CellRevealed v) { */
+/*                              os << numDisplayTable[v.numAdjacentMines]; */
+/*                            }}, */
+/*                    state); */
+/*       } */
+/*       os << "|" << std::endl; */
+/*     } */
+/*     os << "+" << std::string(width * 2, '-') << "+" << std::endl; */
+/*   } */
+/* }; */
+/**/
+/* void TermDisplay::notify() { */
+/**/
+/*   os << std::format("Mines: {}/{}", getBoard()->getNumFlagged(), */
+/*                     getBoard()->getNumMines()) */
+/*      << std::endl; */
+/*   os << std::format("Board: {}/{}", getBoard()->getNumRevealed(), */
+/*                     getBoard()->size()) */
+/*      << std::endl; */
+/**/
+/*   if (!std::holds_alternative<std::monostate>(getBoard()->getState())) { */
+/*     getBoard()->accept(PrintRevealedBoardVisitor{os}); */
+/*   } else { */
+/*     getBoard()->accept(PrintBoardVisitor{os}); */
+/*   } */
+/* } */
 
 } // namespace nsweeper

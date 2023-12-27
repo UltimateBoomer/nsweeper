@@ -5,9 +5,9 @@
 #include <variant>
 
 namespace nsweeper {
-Cell::Cell() : Cell{false} {}
+Cell::Cell() {}
 
-Cell::Cell(bool mine) : mine{false} {}
+Cell::Cell(size_t expNumAdjacent) { adjacentCells.reserve(expNumAdjacent); }
 
 bool Cell::hasMine() const { return mine; }
 

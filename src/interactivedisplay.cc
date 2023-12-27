@@ -1,5 +1,5 @@
 #include "interactivedisplay.h"
-#include "boardvariant.h"
+#include "boardvisitor.h"
 #include "cellstate.h"
 #include "display.h"
 #include "gamestate.h"
@@ -13,17 +13,11 @@
 #include <variant>
 
 namespace nsweeper {
-struct BoardDimVisitor {
-  std::pair<int, int> operator()(const RegularBoard &board) const {
-    return {board.getWidth() * 2, board.getHeight()};
-  }
-};
-
-InteractiveDisplay::InteractiveDisplay(const BoardVariant &board,
-                                       const Vec2 &cursor, ncpp::Plane &parent)
+InteractiveDisplay::InteractiveDisplay(const Board *board, const size_t &cursor,
+                                       ncpp::Plane &parent)
     : Display{board}, cursor{cursor},
       statDisp{parent, 3, 80, 0, ncpp::NCAlign::Center},
-      boardDisp{parent, 80, 80, 4, ncpp::NCAlign::Center} {}
+      boardDisp{parent, 1, 1, 3, ncpp::NCAlign::Center} {}
 
 struct PrintStatVisitor {
   ncpp::Plane &statDisp;
@@ -39,8 +33,8 @@ struct PrintStatVisitor {
         1, 0,
         std::format("Board: {}/{}", board.getNumRevealed(), board.size())
             .c_str());
-    statDisp.putstr(
-        2, 0, std::format("Pos: {}, {}", cursor.x + 1, cursor.y + 1).c_str());
+    auto &state =
+        std::visit([](auto &board) { return board.getState(); }, board);
   }
 };
 
@@ -54,21 +48,25 @@ struct CellCharVisitor {
   }
 };
 
-struct PrintBoardVisitor {
+struct PrintBoardVisitor : public ConstBoardVisitor {
   ncpp::Plane &boardDisp;
-  const Vec2 &cursor;
+  const size_t &cursor;
 
-  void operator()(const RegularBoard &board) {
+  PrintBoardVisitor(ncpp::Plane &boardDisp, const size_t &cursor)
+      : boardDisp{boardDisp}, cursor{cursor} {}
+
+  virtual void operator()(const RegularBoard &board) override {
     boardDisp.erase();
-    boardDisp.resize(board.getHeight(), board.getWidth() * 2);
-    for (int y = 0; y < board.getHeight(); ++y) {
-      for (int x = 0; x < board.getWidth(); ++x) {
+    auto [width, height] = board.getDim();
+    auto [cx, cy] = board.fromIndex(cursor);
+    boardDisp.resize(height, width * 2);
+    for (int y = 0; y < height; ++y) {
+      for (int x = 0; x < width; ++x) {
         auto &state = board.getCell(x, y).getState();
-        auto c = std::visit(CellCharVisitor{}, state);
-        boardDisp.styles_set(y == cursor.y && x == cursor.x
-                                 ? ncpp::CellStyle::Underline
-                                 : ncpp::CellStyle::None);
-        boardDisp.putstr(y, x * 2, c.c_str());
+        auto cellChar = std::visit(CellCharVisitor{}, state);
+        boardDisp.styles_set(y == cy && x == cx ? ncpp::CellStyle::Underline
+                                                : ncpp::CellStyle::None);
+        boardDisp.putstr(y, x * 2, cellChar.c_str());
       }
     }
   }
@@ -90,15 +88,17 @@ struct RevealedCellCharVisitor {
   }
 };
 
-struct PrintRevealedBoardVisitor {
+struct PrintRevealedBoardVisitor : public ConstBoardVisitor {
   ncpp::Plane &boardDisp;
-  const Vec2 &cursor;
 
-  void operator()(const RegularBoard &board) {
+  PrintRevealedBoardVisitor(ncpp::Plane &boardDisp) : boardDisp{boardDisp} {}
+
+  virtual void operator()(const RegularBoard &board) override {
     boardDisp.erase();
-    boardDisp.resize(board.getHeight(), board.getWidth() * 2);
-    for (int y = 0; y < board.getHeight(); ++y) {
-      for (int x = 0; x < board.getWidth(); ++x) {
+    auto [width, height] = board.getDim();
+    boardDisp.resize(height, width * 2);
+    for (int y = 0; y < height; ++y) {
+      for (int x = 0; x < width; ++x) {
         auto &cell = board.getCell(x, y);
         auto c = std::visit(RevealedCellCharVisitor{cell}, cell.getState());
         boardDisp.putstr(y, x * 2, c.c_str());
@@ -108,14 +108,37 @@ struct PrintRevealedBoardVisitor {
 };
 
 void InteractiveDisplay::notify() {
-  std::visit(PrintStatVisitor{statDisp, cursor}, getBoard());
-  auto state =
-      std::visit([](auto &board) { return board.getState(); }, getBoard());
-  if (std::holds_alternative<GameLost>(state)) {
-    std::visit(PrintRevealedBoardVisitor{boardDisp, cursor}, getBoard());
-  } else {
-    std::visit(PrintBoardVisitor{boardDisp, cursor}, getBoard());
-  }
+  drawStat();
+  drawBoard();
+}
+
+void InteractiveDisplay::drawStat() {
+  statDisp.erase();
+  statDisp.putstr(0, 0,
+                  std::format("Mines: {}/{}", getBoard()->getNumFlagged(),
+                              getBoard()->getNumMines())
+                      .c_str());
+  statDisp.putstr(0, 30,
+                  std::format("Revealed: {}/{}", getBoard()->getNumRevealed(),
+                              getBoard()->size())
+                      .c_str());
+  std::visit(Visitor{
+                 [&](std::monostate) {},
+                 [&](GameWon) { statDisp.putstr(1, 0, "You Win!"); },
+                 [&](GameLost) { statDisp.putstr(1, 0, "You Lost!"); },
+             },
+             getBoard()->getState());
+}
+
+void InteractiveDisplay::drawBoard() {
+  boardDisp.erase();
+  std::visit(Visitor{[&](std::monostate) {
+                       getBoard()->accept(PrintBoardVisitor{boardDisp, cursor});
+                     },
+                     [&](auto) {
+                       getBoard()->accept(PrintRevealedBoardVisitor{boardDisp});
+                     }},
+             getBoard()->getState());
 }
 
 } // namespace nsweeper

@@ -2,6 +2,7 @@
 
 #include "vec.h"
 #include <array>
+#include <cstddef>
 
 namespace nsweeper {
 struct GameSetting {

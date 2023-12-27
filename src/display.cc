@@ -1,8 +1,7 @@
 #include "display.h"
-#include "boardvariant.h"
 
 namespace nsweeper {
-Display::Display(const BoardVariant &board) : board{board} {}
+Display::Display(const Board *board) : board{board} {}
 
-const BoardVariant &Display::getBoard() const { return board; }
+const Board *Display::getBoard() const { return board; }
 } // namespace nsweeper

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "boardvariant.h"
 #include "display.h"
 #include "pressresult.h"
 #include "regularboard.h"
@@ -9,16 +8,16 @@
 
 namespace nsweeper {
 class Controller {
-  BoardVariant &board;
+  Board *board;
 
 public:
-  [[nodiscard]] Controller(BoardVariant &board);
+  [[nodiscard]] Controller(Board *board);
   virtual ~Controller() = default;
 
   // Make move on board
   virtual void makeMove() = 0;
 
 protected:
-  [[nodiscard]] BoardVariant &getBoard();
+  [[nodiscard]] Board *getBoard();
 };
 } // namespace nsweeper

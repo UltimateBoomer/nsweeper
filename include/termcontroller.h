@@ -12,7 +12,7 @@ class TermController : public Controller {
   std::ostream &os;
 
 public:
-  [[nodiscard]] TermController(BoardVariant &board, std::istream &is,
+  [[nodiscard]] TermController(Board *board, std::istream &is,
                                std::ostream &os);
 
   void makeMove() override;

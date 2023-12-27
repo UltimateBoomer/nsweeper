@@ -1,10 +1,7 @@
 #pragma once
 
-#include <cstddef>
+#include <utility>
 
 namespace nsweeper {
-struct Vec2 {
-  int x;
-  int y;
-};
+using Vec2 = std::pair<int, int>;
 } // namespace nsweeper

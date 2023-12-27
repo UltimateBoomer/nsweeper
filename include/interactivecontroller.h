@@ -7,11 +7,11 @@
 
 namespace nsweeper {
 class InteractiveController : public Controller {
-  Vec2 &cursor;
+  size_t &cursor;
   ncpp::NotCurses &nc;
 
 public:
-  [[nodiscard]] InteractiveController(BoardVariant &board, Vec2 &cursor,
+  [[nodiscard]] InteractiveController(Board *board, size_t &cursor,
                                       ncpp::NotCurses &nc);
 
   void makeMove() override;

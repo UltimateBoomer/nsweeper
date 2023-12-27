@@ -1,5 +1,5 @@
 #include "interactivecontroller.h"
-#include "boardvariant.h"
+#include "boardvisitor.h"
 #include "controller.h"
 #include "gamestate.h"
 #include "pressresult.h"
@@ -8,37 +8,41 @@
 #include <ncpp/NotCurses.hh>
 
 namespace nsweeper {
-InteractiveController::InteractiveController(BoardVariant &board, Vec2 &cursor,
+InteractiveController::InteractiveController(Board *board, size_t &cursor,
                                              ncpp::NotCurses &nc)
     : Controller{board}, cursor{cursor}, nc{nc} {}
 
-struct MakeMoveVisitor {
+struct MakeMoveVisitor : public BoardVisitor {
   uint32_t k;
-  Vec2 &cursor;
+  size_t &cursor;
 
-  void operator()(RegularBoard &board) {
+  MakeMoveVisitor(uint32_t k, size_t &cursor) : k{k}, cursor{cursor} {}
+
+  virtual void operator()(RegularBoard &board) override {
+    auto [cx, cy] = board.fromIndex(cursor);
+    auto [width, height] = board.getDim();
     switch (k) {
     case 'h':
-      cursor.x -= 1;
-      cursor.x = std::clamp(cursor.x, 0, board.getWidth() - 1);
+      cx = std::clamp(cx - 1, 0, width - 1);
+      cursor = board.toIndex(cx, cy);
       break;
     case 'l':
-      cursor.x += 1;
-      cursor.x = std::clamp(cursor.x, 0, board.getWidth() - 1);
+      cx = std::clamp(cx + 1, 0, width - 1);
+      cursor = board.toIndex(cx, cy);
       break;
     case 'k':
-      cursor.y -= 1;
-      cursor.y = std::clamp(cursor.y, 0, board.getHeight() - 1);
+      cy = std::clamp(cy - 1, 0, height - 1);
+      cursor = board.toIndex(cx, cy);
       break;
     case 'j':
-      cursor.y += 1;
-      cursor.y = std::clamp(cursor.y, 0, board.getHeight() - 1);
+      cy = std::clamp(cy + 1, 0, height - 1);
+      cursor = board.toIndex(cx, cy);
       break;
     case ' ':
-      board.press(cursor);
+      board.Board::press(cursor);
       break;
     case 'f':
-      board.flag(cursor);
+      board.Board::flag(cursor);
       break;
     case 'q':
       board.getState().emplace<GameLost>();
@@ -49,6 +53,6 @@ struct MakeMoveVisitor {
 
 void InteractiveController::makeMove() {
   auto k = nc.get(true);
-  std::visit(MakeMoveVisitor{k, cursor}, getBoard());
+  getBoard()->accept(MakeMoveVisitor{k, cursor});
 }
 } // namespace nsweeper
