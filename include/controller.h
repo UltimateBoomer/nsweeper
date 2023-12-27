@@ -1,8 +1,6 @@
 #pragma once
 
 #include "display.h"
-#include "pressresult.h"
-#include "regularboard.h"
 #include <algorithm>
 #include <random>
 

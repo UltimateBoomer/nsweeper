@@ -1,4 +1,4 @@
-#include "regularboard.h"
+#include "board/regularboard.h"
 #include <algorithm>
 
 namespace nsweeper {

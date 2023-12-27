@@ -1,7 +1,6 @@
 #pragma once
 
 #include "display.h"
-#include "vec.h"
 #include <ncpp/Plane.hh>
 
 namespace nsweeper {

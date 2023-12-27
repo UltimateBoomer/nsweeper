@@ -1,7 +1,7 @@
 #pragma once
 
+#include "board/pressresult.h"
 #include "controller.h"
-#include "pressresult.h"
 #include <algorithm>
 #include <iostream>
 #include <random>

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "controller.h"
-#include "vec.h"
 #include <ncpp/NotCurses.hh>
 #include <ncpp/Plane.hh>
 

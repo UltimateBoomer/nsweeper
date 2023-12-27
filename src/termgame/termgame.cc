@@ -1,10 +1,10 @@
-#include "termgame.h"
+#include "termgame/termgame.h"
+#include "board/boardstate.h"
+#include "board/pressresult.h"
+#include "board/regularboard.h"
 #include "gamesetting.h"
-#include "gamestate.h"
-#include "pressresult.h"
-#include "regularboard.h"
-#include "termcontroller.h"
-#include "termdisplay.h"
+#include "termgame/termcontroller.h"
+#include "termgame/termdisplay.h"
 #include "visitor.h"
 #include <array>
 #include <bits/chrono.h>

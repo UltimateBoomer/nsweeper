@@ -1,6 +1,6 @@
 #pragma once
 
-#include "board.h"
+#include "board/board.h"
 
 namespace nsweeper {
 // Abstract board display that can handle multiple board variants

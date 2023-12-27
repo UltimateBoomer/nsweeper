@@ -1,10 +1,10 @@
-#include "interactivecontroller.h"
-#include "boardvisitor.h"
+#include "interactivegame/interactivecontroller.h"
+#include "board/boardstate.h"
+#include "board/boardvisitor.h"
+#include "board/pressresult.h"
+#include "board/regularboard.h"
+#include "board/vec.h"
 #include "controller.h"
-#include "gamestate.h"
-#include "pressresult.h"
-#include "regularboard.h"
-#include "vec.h"
 #include <ncpp/NotCurses.hh>
 
 namespace nsweeper {

@@ -1,8 +1,8 @@
-#include "interactivegame.h"
+#include "interactivegame/interactivegame.h"
+#include "board/regularboard.h"
 #include "gamesetting.h"
-#include "interactivecontroller.h"
-#include "interactivedisplay.h"
-#include "regularboard.h"
+#include "interactivegame/interactivecontroller.h"
+#include "interactivegame/interactivedisplay.h"
 #include <memory>
 #include <ncpp/NotCurses.hh>
 

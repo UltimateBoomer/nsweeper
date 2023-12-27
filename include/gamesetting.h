@@ -1,6 +1,6 @@
 #pragma once
 
-#include "vec.h"
+#include "board/vec.h"
 #include <array>
 #include <cstddef>
 

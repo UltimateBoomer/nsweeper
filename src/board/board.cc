@@ -1,5 +1,5 @@
-#include "board.h"
-#include "pressresult.h"
+#include "board/board.h"
+#include "board/pressresult.h"
 
 namespace nsweeper {
 PressResult Board::press(size_t i) {
@@ -27,9 +27,9 @@ Cell &Board::getCell(size_t i) { return cells[i]; }
 
 const Cell &Board::getCell(size_t i) const { return cells[i]; }
 
-GameState &Board::getState() { return state; }
+BoardState &Board::getState() { return state; }
 
-const GameState &Board::getState() const { return state; }
+const BoardState &Board::getState() const { return state; }
 
 void Board::clear() {
   for (auto &c : cells) {

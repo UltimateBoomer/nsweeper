@@ -1,7 +1,7 @@
-#include "termcontroller.h"
-#include "boardvisitor.h"
-#include "pressresult.h"
-#include "regularboard.h"
+#include "termgame/termcontroller.h"
+#include "board/boardvisitor.h"
+#include "board/pressresult.h"
+#include "board/regularboard.h"
 #include "visitor.h"
 #include <functional>
 #include <istream>

@@ -1,6 +1,6 @@
-#include "cell.h"
-#include "cellstate.h"
-#include "pressresult.h"
+#include "board/cell.h"
+#include "board/cellstate.h"
+#include "board/pressresult.h"
 #include "visitor.h"
 #include <variant>
 

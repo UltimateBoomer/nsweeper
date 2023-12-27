@@ -1,10 +1,9 @@
 #pragma once
 
+#include "boardstate.h"
 #include "boardvisitor.h"
 #include "cell.h"
-#include "gamestate.h"
 #include "pressresult.h"
-#include "subject.h"
 #include <variant>
 
 namespace nsweeper {
@@ -15,7 +14,7 @@ class Board {
   size_t numMines;
   size_t numRevealed;
   size_t numFlagged;
-  GameState state;
+  BoardState state;
 
 public:
   virtual ~Board() = default;
@@ -29,8 +28,8 @@ public:
   [[nodiscard]] Cell &getCell(size_t i);
   [[nodiscard]] const Cell &getCell(size_t i) const;
 
-  GameState &getState();
-  const GameState &getState() const;
+  BoardState &getState();
+  const BoardState &getState() const;
 
   void clear();
 
