@@ -6,6 +6,7 @@
 #include "board/vec.h"
 #include "controller.h"
 #include <ncpp/NotCurses.hh>
+#include <notcurses/notcurses.h>
 
 namespace nsweeper {
 InteractiveController::InteractiveController(Board *board, size_t &cursor,
@@ -52,7 +53,10 @@ struct MakeMoveVisitor : public BoardVisitor {
 };
 
 void InteractiveController::makeMove() {
-  auto k = nc.get(true);
-  getBoard()->accept(MakeMoveVisitor{k, cursor});
+  ncinput in;
+  nc.get(true, &in);
+  if (in.evtype == NCTYPE_PRESS) {
+    getBoard()->accept(MakeMoveVisitor{in.id, cursor});
+  }
 }
 } // namespace nsweeper
